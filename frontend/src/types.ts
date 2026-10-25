@@ -1,0 +1,3 @@
+export type Profile = { id: number; name: string; product_facts: string[]; restricted_words: string[]; required_phrases: string[]; brand_colours: string[]; updated_at: string }
+export type Finding = { id: string; category: string; severity: 'high' | 'medium' | 'low'; excerpt: string; explanation: string; suggestion: string }
+export type Review = { id: number; title: string; content: string; status: string; findings: Finding[]; reviewer_note: string; created_at: string; updated_at: string; attachments: { id: number; original_name: string }[]; revisions: { version: number; content: string; created_at: string }[]; events: { action: string; note: string; created_at: string }[] }
