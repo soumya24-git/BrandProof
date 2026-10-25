@@ -1,6 +1,21 @@
 import type { Profile, Review } from './types'
-const base = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+
+const configuredBase = import.meta.env.VITE_API_URL?.trim()
+const base = (configuredBase || (import.meta.env.DEV ? 'http://127.0.0.1:8000/api' : '')).replace(/\/+$/, '')
+const invalidProductionBase = (() => {
+  if (!import.meta.env.PROD || !base) return import.meta.env.PROD && !base
+  try {
+    const url = new URL(base)
+    return !['http:', 'https:'].includes(url.protocol) || ['localhost', '127.0.0.1', '::1'].includes(url.hostname)
+  } catch {
+    return true
+  }
+})()
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  if (invalidProductionBase) {
+    throw new Error('VITE_API_URL must be set to the deployed Django API URL ending in /api. A local address cannot be used in production.')
+  }
   const response = await fetch(`${base}${url}`, init)
   if (!response.ok) {
     const body = await response.json().catch(() => ({}))
